@@ -51,7 +51,7 @@ cap = cv2.VideoCapture(sys.argv[1])
 
 ret,img = cap.read()
 sx, sy, ex, ey = select_roi(img)
-mask=edge_detector(img[sy : ey, sx : ex])
+mask = edge_detector(img[sy : ey, sx : ex])
 score_window = collections.deque(maxlen=5)
 
 isCommercial = False
