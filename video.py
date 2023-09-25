@@ -11,8 +11,7 @@ def exited_commercial(sw,threshold = 0.2):
     return sw[-1]>threshold
 
 # when the logo shrinks or slides, there are a couple frames where we get a partial match
-# look at the last 5 matches and check for a sharp transition before flagging as a commercial,
-# to avoid false positives
+# look at the last 5 matches and check for a sharp transition before flagging as a commercial
 # NOTE: for this to work, we must process every frame
 def entered_commercial(sw,threshold = 0.9975):
     if(len(sw)<5):
