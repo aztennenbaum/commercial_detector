@@ -40,10 +40,10 @@ def select_roi(img):
     cv2.imshow("image", img)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
-    sx=param[0][0][0]
-    sy=param[0][0][1]
-    ex=param[0][1][0]
-    ey=param[0][1][1]
+    sx=param[0][0][0] #start x
+    sy=param[0][0][1] #start y
+    ex=param[0][1][0] #end x
+    ey=param[0][1][1] #end y
     return (sx,sy,ex,ey)
 
 def edge_detector(img):
