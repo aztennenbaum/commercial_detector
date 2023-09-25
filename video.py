@@ -47,8 +47,6 @@ def select_roi(img):
     return (sx,sy,ex,ey)
 
 def edge_detector(img):
-    #cv2.imshow("image",img)
-    #cv2.waitKey(0)
     x = np.asarray(cv2.Sobel(src=img, ddepth=cv2.CV_64F, dx=1, dy=1, ksize=1)).flatten()
     return x/np.sqrt((x**2).sum()+np.finfo(x.dtype).eps)
 
