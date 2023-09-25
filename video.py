@@ -29,11 +29,9 @@ def select_roi(img):
     ey = param[0][1][1]  # end y
     return (sx, sy, ex, ey)
 
-
 # reads the most recent score from the score window. if its above the threshold, we are not in commercial
 def exited_commercial(sw, threshold=0.2):
     return sw[-1] > threshold
-
 
 # when the logo shrinks or slides, there are a couple frames where we get a partial match
 # look at the last 5 matches and check for a sharp transition before flagging as a commercial
@@ -44,14 +42,11 @@ def entered_commercial(sw, threshold=0.9975):
     else:
         return (sw[0] + sw[1]) / np.sqrt(
             2 * (sw[0] ** 2 + sw[1] ** 2 + sw[-2] ** 2 + sw[-1] ** 2)
-            + np.finfo(float).eps
-        ) > threshold
-
+            + np.finfo(float).eps) > threshold
 
 def edge_detector(img):
     x = np.asarray(cv2.Sobel(src=img, ddepth=cv2.CV_64F, dx=1, dy=1, ksize=1)).flatten()
     return x / np.sqrt((x**2).sum() + np.finfo(x.dtype).eps)
-
 
 # file to read for capture
 cap = cv2.VideoCapture(sys.argv[1])
@@ -73,11 +68,7 @@ while cap.isOpened():
     elif entered_commercial(score_window):
         isCommercial = True
     if frame % 30 == 0:
-        print(
-            "Frame={}, score={}, isCommercial={}".format(
-                frame, score_window[-1], isCommercial
-            )
-        )
+        print("Frame={}, score={}, isCommercial={}".format(frame, score_window[-1], isCommercial))
     cv2.imshow("frame", img)
     if cv2.waitKey(1) & 0xFF == ord("q"):
         break
