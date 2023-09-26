@@ -48,31 +48,46 @@ def edge_detector(img):
     x = np.asarray(cv2.Sobel(src=img, ddepth=cv2.CV_64F, dx=1, dy=1, ksize=1)).flatten()
     return x / np.sqrt((x**2).sum() + np.finfo(x.dtype).eps)
 
-# file to read for capture
-cap = cv2.VideoCapture(sys.argv[1])
+def new_score_window():
+    return collections.deque(maxlen=5)
 
-ret, img = cap.read()
-sx, sy, ex, ey = select_roi(img)
-mask = edge_detector(img[sy:ey, sx:ex])
-score_window = collections.deque(maxlen=5)
-
-isCommercial = False
-frame = 0
-print("Press 'q' to quit")
-while cap.isOpened():
-    ret, img = cap.read()
-    score_window.append(np.dot(edge_detector(img[sy:ey, sx:ex]), mask))
-
+# returns whether we are still in a commercial
+# inputs:
+# - the previous commercial state
+# - a rolling window of the last 5 scores (score_window)
+# - edges from the roi of our frame
+# - edges of our detection logo
+def detect_commercial(sw, is_commercial, edges, logo):
+    sw.append(np.dot(edges, logo))
     if exited_commercial(score_window):
-        isCommercial = False
+        return False
     elif entered_commercial(score_window):
-        isCommercial = True
-    if frame % 30 == 0:
-        print("Frame={}, score={}, isCommercial={}".format(frame, score_window[-1], isCommercial))
-    cv2.imshow("frame", img)
-    if cv2.waitKey(1) & 0xFF == ord("q"):
-        break
-    frame += 1
+        return True
+    else:
+        return is_commercial
 
-cap.release()
-cv2.destroyAllWindows()
+if __name__ == "__main__":
+    cap = cv2.VideoCapture(sys.argv[1])
+    
+    ret, img = cap.read()
+    sx, sy, ex, ey = select_roi(img)
+    logo = edge_detector(img[sy:ey, sx:ex])
+    sw = new_score_window()
+    
+    is_commercial = False
+    frame = 0
+    print("Press 'q' to quit")
+    while cap.isOpened():
+        ret, img = cap.read()
+        is_commercial = detect_commercial(sw, is_commercial, edge_detector(img[sy:ey, sx:ex]), logo)
+        
+        if frame % 30 == 0:
+            print("frame={}, score={}, is_commercial={}".format(frame, score_window[-1], is_commercial))
+        
+        cv2.imshow("frame", img)
+        if cv2.waitKey(1) & 0xFF == ord("q"):
+            break
+        frame += 1
+    
+    cap.release()
+    cv2.destroyAllWindows()
